@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Perfetto Auto-Pin Icon Generator</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 { color: #1a73e8; }
+    .canvas-container {
+      display: flex;
+      gap: 20px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .canvas-item {
+      text-align: center;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    canvas {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .size-label {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    button {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #1557b0;
+    }
+    .download-links {
+      margin-top: 20px;
+    }
+    .download-links a {
+      display: inline-block;
+      margin: 5px 10px;
+      color: #1a73e8;
+    }
+    .instructions {
+      background: #e8f0fe;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📌 Perfetto Auto-Pin Icon Generator</h1>
+  <p>This tool generates PNG icons for the Chrome extension.</p>
+
+  <div class="canvas-container">
+    <div class="canvas-item">
+      <canvas id="canvas16" width="16" height="16"></canvas>
+      <div class="size-label">16x16</div>
+    </div>
+    <div class="canvas-item">
+      <canvas id="canvas48" width="48" height="48"></canvas>
+      <div class="size-label">48x48</div>
+    </div>
+    <div class="canvas-item">
+      <canvas id="canvas128" width="128" height="128"></canvas>
+      <div class="size-label">128x128</div>
+    </div>
+  </div>
+
+  <button onclick="downloadAll()">Download All Icons</button>
+
+  <div class="download-links" id="downloadLinks"></div>
+
+  <div class="instructions">
+    <h3>Instructions:</h3>
+    <ol>
+      <li>Click "Download All Icons" to download all three icon sizes</li>
+      <li>Save the downloaded PNG files to the <code>icons/</code> folder</li>
+      <li>Rename them to: <code>icon16.png</code>, <code>icon48.png</code>, <code>icon128.png</code></li>
+    </ol>
+  </div>
+
+  <script>
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      const scale = size / 128;
+
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#4285f4');
+      gradient.addColorStop(1, '#1a73e8');
+
+      // Rounded rectangle background
+      const radius = 24 * scale;
+      const margin = 8 * scale;
+      ctx.beginPath();
+      ctx.moveTo(margin + radius, margin);
+      ctx.lineTo(size - margin - radius, margin);
+      ctx.quadraticCurveTo(size - margin, margin, size - margin, margin + radius);
+      ctx.lineTo(size - margin, size - margin - radius);
+      ctx.quadraticCurveTo(size - margin, size - margin, size - margin - radius, size - margin);
+      ctx.lineTo(margin + radius, size - margin);
+      ctx.quadraticCurveTo(margin, size - margin, margin, size - margin - radius);
+      ctx.lineTo(margin, margin + radius);
+      ctx.quadraticCurveTo(margin, margin, margin + radius, margin);
+      ctx.closePath();
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // Pin icon (simplified for smaller sizes)
+      ctx.fillStyle = 'white';
+      const cx = size / 2;
+      const cy = size / 2;
+
+      if (size >= 48) {
+        // Pin body
+        ctx.beginPath();
+        ctx.moveTo(cx - 18 * scale, cy - 24 * scale);
+        ctx.lineTo(cx + 18 * scale, cy - 24 * scale);
+        ctx.lineTo(cx + 18 * scale, cy - 6 * scale);
+        ctx.lineTo(cx + 8 * scale, cy - 6 * scale);
+        ctx.lineTo(cx + 8 * scale, cy + 16 * scale);
+        ctx.lineTo(cx - 8 * scale, cy + 16 * scale);
+        ctx.lineTo(cx - 8 * scale, cy - 6 * scale);
+        ctx.lineTo(cx - 18 * scale, cy - 6 * scale);
+        ctx.closePath();
+        ctx.fill();
+
+        // Pin tip
+        ctx.beginPath();
+        ctx.moveTo(cx - 4 * scale, cy + 16 * scale);
+        ctx.lineTo(cx + 4 * scale, cy + 16 * scale);
+        ctx.lineTo(cx, cy + 30 * scale);
+        ctx.closePath();
+        ctx.fill();
+      } else {
+        // Simplified pin for 16x16
+        ctx.beginPath();
+        ctx.arc(cx, cy - 2, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(cx - 1.5, cy + 2, 3, 6);
+      }
+    }
+
+    function initIcons() {
+      [16, 48, 128].forEach(size => {
+        const canvas = document.getElementById('canvas' + size);
+        drawIcon(canvas, size);
+      });
+    }
+
+    function downloadAll() {
+      const links = document.getElementById('downloadLinks');
+      links.innerHTML = '';
+
+      [16, 48, 128].forEach(size => {
+        const canvas = document.getElementById('canvas' + size);
+        const dataUrl = canvas.toDataURL('image/png');
+
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `icon${size}.png`;
+        link.textContent = `icon${size}.png`;
+        links.appendChild(link);
+
+        // Trigger download
+        link.click();
+      });
+    }
+
+    initIcons();
+  </script>
+</body>
+</html>

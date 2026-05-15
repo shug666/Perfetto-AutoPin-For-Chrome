@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Perfetto Auto-Pin",
+    "description": "The name of the extension"
+  },
+  "extDescription": {
+    "message": "One-click pin tracks in Perfetto UI with built-in Android performance analysis presets",
+    "description": "The description of the extension"
+  }
+}

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfetto Auto-Pin</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>📌 Perfetto Auto-Pin</h1>
+      <span id="status" class="status status-checking">检测中...</span>
+    </header>
+
+    <!-- Not on Perfetto warning -->
+    <div id="not-perfetto" class="warning-box hidden">
+      <p>⚠️ 请在 <a href="https://ui.perfetto.dev" target="_blank">ui.perfetto.dev</a> 页面使用此插件（您也可在设置中添加其他 Perfetto UI 网址）</p>
+    </div>
+
+    <!-- Main content -->
+    <main id="main-content" class="hidden">
+      <!-- Tab Navigation -->
+      <nav class="tabs">
+        <button class="tab active" data-tab="scenes">场景预设</button>
+        <button class="tab" data-tab="tracks">泳道选择</button>
+        <button class="tab" data-tab="settings">设置</button>
+      </nav>
+
+      <!-- Scenes Tab -->
+      <div id="scenes-tab" class="tab-content active">
+        <!-- Global Unpin Button -->
+        <div class="section">
+          <button id="unpin-all-global" class="btn btn-secondary btn-full">
+            🔓 Unpin 全部泳道
+          </button>
+        </div>
+
+        <!-- Recent History Section -->
+        <div id="history-section" class="section hidden">
+          <h3>最近使用</h3>
+          <div id="recent-history" class="scene-list">
+            <!-- Recent history will be populated by JS -->
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>预设场景</h3>
+          <div id="preset-scenes" class="scene-list">
+            <!-- Preset scenes will be populated by JS -->
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>自定义场景</h3>
+          <div id="custom-scenes" class="scene-list">
+            <!-- Custom scenes will be populated by JS -->
+          </div>
+          <button id="add-scene-btn" class="btn btn-secondary btn-full">
+            ➕ 添加新场景
+          </button>
+        </div>
+      </div>
+
+      <!-- Tracks Tab -->
+      <div id="tracks-tab" class="tab-content">
+        <div class="section">
+          <div class="search-box">
+            <input type="text" id="track-search" placeholder="🔍 搜索泳道 (支持通配符 *)..." />
+            <button id="refresh-tracks" class="btn btn-icon" title="刷新泳道列表">🔄</button>
+          </div>
+          <div class="track-toolbar">
+            <div class="view-toggle">
+              <button id="view-flat" class="view-btn active" title="平铺视图">📋</button>
+              <button id="view-grouped" class="view-btn" title="分组视图">📁</button>
+            </div>
+            <div class="selection-actions">
+              <button id="select-all" class="btn btn-small">全选</button>
+              <button id="select-none" class="btn btn-small">取消</button>
+              <span id="selection-count" class="selection-count">已选: 0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div id="track-list" class="track-list">
+            <p class="loading">正在加载泳道列表...</p>
+          </div>
+        </div>
+
+        <div class="section actions">
+          <button id="pin-selected" class="btn btn-primary" disabled>📌 Pin 选中</button>
+          <button id="save-as-scene" class="btn btn-secondary">💾 保存为场景</button>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div id="settings-tab" class="tab-content">
+        <div class="section">
+          <h3>支持的网址</h3>
+          <div id="supported-urls-list" class="url-list">
+            <!-- Populated by JS -->
+          </div>
+          <div class="add-url-form">
+            <input type="text" id="new-url-input" placeholder="例如：https://perfetto.internal.com" />
+            <button id="add-url-btn" class="btn btn-secondary">添加</button>
+          </div>
+          <p class="text-muted setting-desc">添加您内部部署的 Perfetto UI 网址，使插件能在其上工作</p>
+        </div>
+
+        <div class="section">
+          <h3>匹配设置</h3>
+          <label class="checkbox-label">
+            <input type="checkbox" id="fuzzy-match" checked />
+            <span>启用模糊匹配</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="case-insensitive" checked />
+            <span>忽略大小写</span>
+          </label>
+        </div>
+
+        <div class="section">
+          <h3>标注增强</h3>
+          <label class="checkbox-label">
+            <input type="checkbox" id="persist-duration" checked />
+            <span>持久化时长显示 (Shift+M 标注)</span>
+          </label>
+          <p class="text-muted setting-desc">为所有 Shift+M 创建的区间标注持久显示时长信息</p>
+        </div>
+
+        <div class="section">
+          <h3>数据管理</h3>
+          <div class="btn-group">
+            <button id="export-config" class="btn btn-secondary">📤 导出配置</button>
+            <button id="import-config" class="btn btn-secondary">📥 导入配置</button>
+          </div>
+          <input type="file" id="import-file" accept=".json" class="hidden" />
+        </div>
+
+        <div class="section">
+          <h3>关于</h3>
+          <div class="about-info">
+            <p class="text-muted">版本: 1.0.0</p>
+            <p class="text-muted">作者: Gracker</p>
+            <p class="text-muted">用于 Android 性能分析</p>
+            <p class="about-link">
+              <a href="https://www.androidperformance.com/" target="_blank">🌐 访问 androidperformance.com</a>
+            </p>
+            <p class="text-muted about-link-desc">获取更多 Android 性能优化技巧</p>
+            <p class="about-link">
+              <a id="rate-extension" href="#" target="_blank">⭐ 觉得有用？给个好评！</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Scene Editor Modal -->
+    <div id="scene-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-title">添加场景</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="scene-name">场景名称</label>
+            <input type="text" id="scene-name" placeholder="例如：帧率分析" />
+          </div>
+          <div class="form-group">
+            <label for="scene-tracks">泳道列表 (每行一个，支持通配符 *)</label>
+            <textarea id="scene-tracks" rows="8" placeholder="main thread&#10;RenderThread&#10;vsync-*&#10;GPU completion"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="scene-icon">图标 (可选)</label>
+            <input type="text" id="scene-icon" placeholder="🎬" maxlength="2" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="modal-restore-default" class="btn btn-secondary hidden">恢复默认</button>
+          <div class="modal-footer-right">
+            <button id="modal-cancel" class="btn btn-secondary">取消</button>
+            <button id="modal-save" class="btn btn-primary">保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

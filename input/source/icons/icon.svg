@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4285f4"/>
+      <stop offset="100%" style="stop-color:#1a73e8"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect x="8" y="8" width="112" height="112" rx="24" fill="url(#bg)"/>
+  <!-- Pin icon -->
+  <g transform="translate(64, 64)">
+    <!-- Pin body -->
+    <path d="M-24 -32 L24 -32 L24 -8 L12 -8 L12 24 L-12 24 L-12 -8 L-24 -8 Z"
+          fill="white" opacity="0.95"/>
+    <!-- Pin tip -->
+    <path d="M-4 24 L4 24 L0 40 Z" fill="white" opacity="0.95"/>
+    <!-- Pin head highlight -->
+    <rect x="-20" y="-28" width="40" height="8" rx="2" fill="white" opacity="0.3"/>
+  </g>
+  <!-- Small "P" for Perfetto -->
+  <text x="98" y="108" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" opacity="0.9">P</text>
+</svg>
